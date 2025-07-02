@@ -1,10 +1,5 @@
-import os
 import subprocess
 import sys
-
-# change working directory to mirlab folder
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
 from mirlab.selector import select_file_with_gui
 
 def main():
@@ -13,7 +8,7 @@ def main():
         print("\nNo file selected.")
         sys.exit(1)
 
-    print("\nFile selection complete. \nLaunching TUI for analysis...")
+    print("\nFile selection complete.\nLaunching TUI for analysis...")
     subprocess.run(["python3", "-m", "mirlab.menu"])
 
 if __name__ == "__main__":

@@ -1,22 +1,12 @@
+import os
+import subprocess
+import librosa
 from textual.app import App, ComposeResult
 from textual.widgets import Static, Button
 from textual.containers import Vertical
-import subprocess
-import librosa
-import os
-
-def get_analysis_scripts():
-    analysis_dir = os.path.join(os.path.dirname(__file__), "analysis")
-    scripts = []
-    for filename in os.listdir(analysis_dir):
-        if filename.endswith(".py") and not filename.startswith("__") and not filename.startswith("_"):
-            script_name = filename[:-3]
-            label = script_name.replace("_", " ").title()
-            scripts.append((script_name, label))
-    return scripts
 
 class MIRMenu(App):
-    CSS_PATH = "menu.tcss"
+    CSS_PATH = os.path.join(os.path.dirname(__file__), "menu.tcss")
 
     def get_audio_info(self):
         try:
@@ -24,21 +14,32 @@ class MIRMenu(App):
                 path = f.read().strip()
             if not os.path.isfile(path):
                 return "No valid audio file selected."
+
             y, sr = librosa.load(path, sr=None, mono=False)
             duration = librosa.get_duration(y=y, sr=sr)
             channels = 1 if y.ndim == 1 else y.shape[0]
-            return (
+
+            info = (
                 f"File: {os.path.basename(path)}\n"
                 f"Sample Rate: {sr} Hz | "
                 f"Duration: {int(duration // 60)} min {int(duration % 60)} sec | "
                 f"Channels: {channels}"
             )
+            return info
         except Exception as e:
             return f"Errore nel caricamento file audio:\n{e}"
 
+    def get_analysis_modules(self):
+        analysis_dir = os.path.join(os.path.dirname(__file__), "analysis")
+        modules = [
+            f[:-3] for f in os.listdir(analysis_dir)
+            if f.endswith(".py") and f != "__init__.py"
+        ]
+        return modules
+
     def compose(self) -> ComposeResult:
         yield Static(self.get_audio_info(), classes="header")
-        buttons = [Button(label, id=script_id) for script_id, label in get_analysis_scripts()]
+        buttons = [Button(mod.replace("_", " ").title(), id=mod) for mod in self.get_analysis_modules()]
         buttons.append(Button("Exit", id="exit"))
         yield Vertical(*buttons, classes="menu")
 
