@@ -1,0 +1,34 @@
+Screen {
+  background: black;
+  color: white;
+}
+
+.header {
+  text-align: center;
+  padding: 2 0;
+  height: auto;
+  color: white;
+  border: none;
+}
+
+.menu {
+  align-horizontal: center;
+  align-vertical: middle;
+  padding: 2;
+  border: solid white;
+  background: black;
+}
+
+Button {
+  background: black;
+  color: white;
+  border: solid white;
+  margin: 1 0;
+  width: 50;
+}
+
+Button:hover {
+  background: #444444;
+  color: white;
+  border: solid #888888;
+}
