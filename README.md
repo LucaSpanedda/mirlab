@@ -39,7 +39,7 @@ pip install numpy scipy matplotlib librosa textual
 ## Installation
 
 ```bash
-git clone https://github.com/yourusername/mirlab.git
+git clone https://github.com/LucaSpanedda/mirlab.git
 cd mirlab
 pip install .
 ```
