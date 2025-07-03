@@ -15,20 +15,13 @@ Screen {
   align-horizontal: center;
   align-vertical: middle;
   padding: 2;
-  border: solid white;
   background: black;
+  height: auto;
+  width: 100%;
 }
 
-Button {
-  background: black;
-  color: white;
-  border: solid white;
-  margin: 1 0;
-  width: 50;
-}
-
-Button:hover {
-  background: #444444;
-  color: white;
-  border: solid #888888;
+MenuItem {
+  width: 100%;
+  margin: 0;
+  text-align: center;
 }

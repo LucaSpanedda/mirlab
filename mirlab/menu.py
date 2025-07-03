@@ -2,8 +2,40 @@ import os
 import subprocess
 import librosa
 from textual.app import App, ComposeResult
-from textual.widgets import Static, Button
+from textual.widgets import Static
 from textual.containers import Vertical
+from textual.reactive import reactive
+
+class MenuItem(Static):
+    is_selected = reactive(False)
+    width = 50  # larghezza fissa per uniformare i box
+    
+    def __init__(self, text, module_name=None, *args, **kwargs):
+        super().__init__(text, *args, **kwargs)
+        self.module_name = module_name or text.lower().replace(" ", "_")
+
+    def render(self):
+        text = self.renderable
+        padding = self.width - len(text)
+        left_pad = padding // 2
+        right_pad = padding - left_pad
+        padded_text = " " * left_pad + text + " " * right_pad
+
+        border_line = "─" * self.width
+        if self.is_selected:
+            # evidenzia con sfondo bianco e testo nero
+            style = "bold black on white"
+            border_style = "white"
+        else:
+            style = "white on black"
+            border_style = "white"
+
+        lines = [
+            f"[{border_style}]┌{border_line}┐[/]",
+            f"[{border_style}]│[/][{style}]{padded_text}[/{style}][{border_style}]│[/]",
+            f"[{border_style}]└{border_line}┘[/]",
+        ]
+        return "\n".join(lines)
 
 class MIRMenu(App):
     CSS_PATH = os.path.join(os.path.dirname(__file__), "menu.tcss")
@@ -35,20 +67,34 @@ class MIRMenu(App):
             f[:-3] for f in os.listdir(analysis_dir)
             if f.endswith(".py") and f != "__init__.py"
         ]
-        return modules
+        return sorted(modules)
 
     def compose(self) -> ComposeResult:
         yield Static(self.get_audio_info(), classes="header")
-        buttons = [Button(mod.replace("_", " ").title(), id=mod) for mod in self.get_analysis_modules()]
-        buttons.append(Button("Exit", id="exit"))
-        yield Vertical(*buttons, classes="menu")
+        modules = self.get_analysis_modules()
+        self.menu_items = [MenuItem(mod.replace("_", " ").title(), mod) for mod in modules]
+        self.menu_items.append(MenuItem("Exit", "exit"))
+        # Contenitore verticale centrato
+        yield Vertical(*self.menu_items, classes="menu")
+        self.selected_index = 0
+        self.menu_items[self.selected_index].is_selected = True
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        btn_id = event.button.id
-        if btn_id == "exit":
-            self.exit()
-        else:
-            subprocess.run(["python3", "-m", f"mirlab.analysis.{btn_id}"])
+    def on_key(self, event):
+        if event.key == "down":
+            self.menu_items[self.selected_index].is_selected = False
+            self.selected_index = (self.selected_index + 1) % len(self.menu_items)
+            self.menu_items[self.selected_index].is_selected = True
+        elif event.key == "up":
+            self.menu_items[self.selected_index].is_selected = False
+            self.selected_index = (self.selected_index - 1) % len(self.menu_items)
+            self.menu_items[self.selected_index].is_selected = True
+        elif event.key == "enter":
+            selected_item = self.menu_items[self.selected_index]
+            module_name = selected_item.module_name
+            if module_name == "exit":
+                self.exit()
+            else:
+                subprocess.run(["python3", "-m", f"mirlab.analysis.{module_name}"])
 
 if __name__ == "__main__":
     MIRMenu().run()
