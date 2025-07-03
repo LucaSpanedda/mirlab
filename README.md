@@ -1,6 +1,6 @@
-# mirlab
+# MIRLAB
 
-**mirlab** is a terminal-based audio analysis toolkit designed for inspection of
+**Mirlab** is a terminal-based audio analysis toolkit designed for inspection of
 audio files.
 It features a TUI (Text User Interface),
 automated script discovery,
@@ -39,8 +39,8 @@ pip install numpy scipy matplotlib librosa textual
 ## Installation
 
 ```bash
-git clone https://github.com/LucaSpanedda/mirlab.git
-cd mirlab
+git clone https://github.com/LucaSpanedda/MIRLAB.git
+cd MIRLAB
 pip install .
 ```
 
